@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-900">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matchat - Estude & Converse em Segurança</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0eeef',
+              100: '#e1dbee',
+              500: '#6C5CE7',
+              600: '#5b4bc4',
+              700: '#4a3aa1',
+              accent: '#00CEC9',
+              pink: '#FD79A8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Transições de Tela */
+    .screen {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .screen.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animação do Scanner Face ID */
+    @keyframes faceScan {
+      0% { top: 10%; opacity: 0.3; }
+      50% { top: 85%; opacity: 1; }
+      100% { top: 10%; opacity: 0.3; }
+    }
+    .scan-line {
+      animation: faceScan 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+    .pulse-glow {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+
+    /* Scrollbar personalizado */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="h-full flex items-center justify-center p-0 md:p-4 bg-slate-900 font-sans antialiased text-slate-800 select-none">
+
+  <!-- Simulação de Moldura de Smartphone Mobile -->
+  <div class="w-full md:max-w-[420px] h-full md:h-[850px] bg-white md:rounded-[45px] shadow-2xl flex flex-col overflow-hidden relative border-0 md:border-[10px] border-slate-800">
+    
+    <!-- Barra Superior de Status (Mobile Header) -->
+    <div class="bg-slate-950 text-white text-xs px-6 pt-3 pb-2 flex justify-between items-center z-40 shrink-0">
+      <span class="font-semibold tracking-tight text-[11px]" id="clock">09:41</span>
+      <div class="w-20 h-4 bg-slate-800 rounded-full hidden md:block"></div>
+      <div class="flex items-center space-x-2 text-[11px] text-slate-300">
+        <i class="fas fa-signal"></i>
+        <i class="fas fa-wifi"></i>
+        <i class="fas fa-battery-three-quarters text-emerald-400"></i>
+      </div>
+    </div>
+
+    <!-- NOTIFICAÇÃO TOAST DE SEGURANÇA E ALERTAS -->
+    <div id="toast" class="absolute top-12 left-4 right-4 bg-slate-900/95 text-white p-3 rounded-2xl shadow-xl border border-slate-700/50 flex items-center gap-3 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+      <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-xs font-bold shrink-0">
+        <i class="fas fa-shield-halved text-white" id="toast-icon"></i>
+      </div>
+      <div class="flex-1 text-xs">
+        <p class="font-bold text-slate-100" id="toast-title">Notificação</p>
+        <p class="text-slate-300 text-[11px]" id="toast-body">Mensagem do sistema Matchat</p>
+      </div>
+    </div>
+
+    <!-- ÁREA DE CONTEÚDO DAS TELAS -->
+    <div class="flex-1 relative overflow-hidden bg-slate-50 flex flex-col">
+
+      <!-- 1. TELA DE SPLASH / BOAS-VINDAS -->
+      <div id="screen-splash" class="screen active flex-col h-full bg-gradient-to-br from-brand-600 via-brand-500 to-indigo-800 text-white p-6 justify-between text-center relative overflow-hidden z-10">
+        <div class="absolute -top-12 -right-12 w-48 h-48 bg-brand-accent/20 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-brand-pink/20 rounded-full blur-2xl"></div>
+
+        <div class="pt-6">
+          <span class="bg-white/15 backdrop-blur-md text-white text-[11px] font-semibold px-3.5 py-1.5 rounded-full border border-white/20 inline-block">
+            <i class="fas fa-shield-halved text-brand-accent mr-1"></i> Ambiente Protegido Sub-15
+          </span>
+        </div>
+
+        <div class="my-auto space-y-4 relative z-10">
+          <div class="w-24 h-24 bg-white text-brand-500 rounded-3xl flex items-center justify-center mx-auto shadow-2xl pulse-glow">
+            <i class="fas fa-comments text-5xl text-brand-500"></i>
+          </div>
+          <h1 class="text-4xl font-extrabold tracking-tight">Matchat</h1>
+          <p class="text-indigo-100 text-sm max-w-[270px] mx-auto leading-relaxed font-medium">
+            Tire dúvidas escolares, aprenda em grupo e converse em segurança! 🚀
+          </p>
+        </div>
+
+        <div class="space-y-3 pb-4 relative z-10">
+          <button onclick="navigate('screen-register')" class="w-full bg-white text-brand-600 font-bold py-3.5 rounded-2xl shadow-lg hover:bg-slate-100 transition active:scale-98 text-sm">
+            Criar Nova Conta
+          </button>
+          <button onclick="navigate('screen-login')" class="w-full bg-brand-700/60 backdrop-blur-md text-white font-semibold py-3.5 rounded-2xl border border-white/20 hover:bg-brand-700 transition active:scale-98 text-sm">
+            Já tenho uma conta
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. TELA DE CADASTRO (COM E SEM @ESCOLA) -->
+      <div id="screen-register" class="screen flex-col h-full bg-white p-6 overflow-y-auto">
+        <div class="flex items-center gap-3 mb-4">
+          <button onclick="navigate('screen-splash')" class="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-200">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">Criar sua Conta</h2>
+            <p class="text-xs text-slate-500">Acesso seguro para menores de 15 anos</p>
+          </div>
+        </div>
+
+        <!-- Seletor de Tipo de Conta -->
+        <div class="bg-slate-100 p-1.5 rounded-2xl flex text-xs font-bold mb-4">
+          <button id="btn-reg-type-escola" onclick="toggleRegisterEmailType('escola')" class="flex-1 py-2.5 rounded-xl bg-white text-brand-600 shadow-sm transition">
+            <i class="fas fa-school mr-1"></i> Com @escola
+          </button>
+          <button id="btn-reg-type-pessoal" onclick="toggleRegisterEmailType('pessoal')" class="flex-1 py-2.5 rounded-xl text-slate-500 transition">
+            <i class="fas fa-user-lock mr-1"></i> Sem @escola
+          </button>
+        </div>
+
+        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="font-bold text-slate-700">Seu Nome Completo</label>
+            <input type="text" id="reg-name" required placeholder="Ex: Ana Beatriz Silva" class="w-full mt-1 p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+
+          <!-- Campo E-mail Dinâmico -->
+          <div id="reg-email-container">
+            <label class="font-bold text-slate-700" id="reg-email-label">E-mail Escolar (@escola, @edu.br)</label>
+            <input type="email" id="reg-email" required placeholder="aluno@escola.pr.gov.br" class="w-full mt-1 p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <p id="reg-email-hint" class="text-[10px] text-slate-400 mt-1">Conexão direta com o sistema da sua escola.</p>
+          </div>
+
+          <!-- Campo E-mail do Responsável (Exibido para contas pessoais) -->
+          <div id="reg-parent-container" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-2xl space-y-1.5">
+            <label class="font-bold text-amber-900 flex items-center gap-1.5">
+              <i class="fas fa-user-shield text-amber-600"></i> E-mail do Pai, Mãe ou Tutor Legal
+            </label>
+            <p class="text-[10px] text-amber-800 leading-tight">
+              Obrigatório para contas pessoais (sub-15). Enviaremos uma solicitação de autorização.
+            </p>
+            <input type="email" id="reg-parent-email" placeholder="responsavel@gmail.com" class="w-full p-2.5 bg-white border border-amber-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700">Ano / Série</label>
+              <select id="reg-grade" class="w-full mt-1 p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                <option>6º Ano Fundamental</option>
+                <option>7º Ano Fundamental</option>
+                <option>8º Ano Fundamental</option>
+                <option>9º Ano Fundamental</option>
+                <option>1º Ano Médio</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700">Crie uma Senha</label>
+              <input type="password" id="reg-pass" required placeholder="******" class="w-full mt-1 p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="reg-faceid" checked class="w-4 h-4 text-brand-500 rounded border-slate-300 focus:ring-brand-500">
+            <label for="reg-faceid" class="text-slate-600 font-medium cursor-pointer">
+              Ativar autenticação rápida com <strong>Face ID</strong>
+            </label>
+          </div>
+
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[10px] text-slate-500 leading-relaxed">
+            <i class="fas fa-lock text-brand-500 mr-1"></i> Ao cadastrar, você concorda com as diretrizes de moderação e segurança para menores de 15 anos do Matchat.
+          </div>
+
+          <button type="submit" class="w-full bg-brand-500 text-white font-bold py-3.5 rounded-2xl shadow-md hover:bg-brand-600 transition">
+            Concluir Cadastro
+          </button>
+        </form>
+      </div>
+
+      <!-- 3. TELA DE LOGIN -->
+      <div id="screen-login" class="screen flex-col h-full bg-white p-6 justify-between overflow-y-auto">
+        <div class="flex items-center gap-3">
+          <button onclick="navigate('screen-splash')" class="w-9 h-9 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-200">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2 class="text-xl font-bold text-slate-800">Acessar Matchat</h2>
+        </div>
+
+        <div class="my-auto space-y-4">
+          <!-- Toggle do tipo de login -->
+          <div class="bg-slate-100 p-1.5 rounded-2xl flex text-xs font-bold">
+            <button id="btn-login-type-escola" onclick="toggleLoginEmailType('escola')" class="flex-1 py-2 rounded-xl bg-white text-brand-600 shadow-sm transition">
+              <i class="fas fa-school mr-1"></i> E-mail @escola
+            </button>
+            <button id="btn-login-type-pessoal" onclick="toggleLoginEmailType('pessoal')" class="flex-1 py-2 rounded-xl text-slate-500 transition">
+              <i class="fas fa-user mr-1"></i> E-mail Pessoal
+            </button>
+          </div>
+
+          <form id="form-login" onsubmit="handleLogin(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="font-bold text-slate-700" id="login-email-label">E-mail Escolar</label>
+              <input type="email" id="login-email" value="aluno@escola.pr.gov.br" required class="w-full mt-1 p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <div>
+              <label class="font-bold text-slate-700">Senha</label>
+              <input type="password" id="login-pass" value="123456" required class="w-full mt-1 p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <button type="submit" class="w-full bg-brand-500 text-white font-bold py-3.5 rounded-2xl shadow-md hover:bg-brand-600 transition">
+              Entrar na Conta
+            </button>
+          </form>
+
+          <div class="relative flex py-1 items-center">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="flex-shrink mx-3 text-slate-400 text-[11px]">OU</span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <!-- Botão Face ID -->
+          <button onclick="triggerFaceIDScan()" class="w-full border-2 border-brand-500 bg-brand-50/50 text-brand-600 py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-brand-100 transition">
+            <i class="fas fa-face-smile text-lg"></i>
+            Entrar com Face ID / Biometria
+          </button>
+        </div>
+
+        <p class="text-[11px] text-center text-slate-400 pt-2">
+          <i class="fas fa-shield-check text-emerald-500"></i> Proteção anti-palavrões e moderação 24/7
+        </p>
+      </div>
+
+      <!-- 4. DASHBOARD PRINCIPAL COM BOTTOM NAV -->
+      <div id="screen-dashboard" class="screen flex-col h-full bg-slate-100 relative">
+        
+        <!-- Header Principal Fixo -->
+        <div class="bg-brand-500 text-white px-4 py-3 flex justify-between items-center shadow-md shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white text-xs font-bold">
+              <i class="fas fa-comments"></i>
+            </div>
+            <div>
+              <h3 class="font-extrabold text-sm leading-none" id="dashboard-header-title">Salas de Estudo</h3>
+              <span class="text-[10px] text-brand-100 font-medium" id="dashboard-user-badge">Conta Escolar Verificada</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="bg-emerald-400/20 text-emerald-200 border border-emerald-400/40 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Moderação On
+            </span>
+          </div>
+        </div>
+
+        <!-- Conteúdo das Abas do App -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+
+          <!-- ABA 1: SALAS DE MATÉRIAS ESCOLARES -->
+          <div id="tab-subjects" class="space-y-3">
+            <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center shrink-0">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <div class="text-xs">
+                <p class="font-bold text-slate-800">Aprenda e Tire Dúvidas!</p>
+                <p class="text-slate-500 text-[11px]">Salas de estudo em grupo moderadas por disciplina escolar.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5" id="subjects-grid">
+              <!-- Gerado via JavaScript -->
+            </div>
+          </div>
+
+          <!-- ABA 2: CONVERSAS PRIVADAS (DMs) -->
+          <div id="tab-private" class="space-y-3 hidden">
+            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl text-[11px] text-emerald-900 flex items-center gap-2">
+              <i class="fas fa-user-shield text-emerald-600 text-base"></i>
+              <span>Mensagens diretas privadas monitoradas pelo filtro anti-palavrões sub-15.</span>
+            </div>
+
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Colegas e Amigos</div>
+
+            <div class="space-y-2" id="friends-list">
+              <!-- Gerado via JavaScript -->
+            </div>
+          </div>
+
+          <!-- ABA 3: PERFIL DO ALUNO E SEGURANÇA PAIS/ESCOLA -->
+          <div id="tab-profile" class="space-y-4 hidden">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 text-center space-y-2 shadow-sm">
+              <div class="w-16 h-16 bg-brand-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto shadow-md">
+                <span id="profile-avatar">AB</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm" id="profile-name">Ana Beatriz Silva</h4>
+                <p class="text-xs text-slate-400" id="profile-email">aluno@escola.pr.gov.br</p>
+              </div>
+
+              <!-- Badge do tipo de conta -->
+              <div id="profile-status-badge">
+                <span class="inline-block bg-blue-100 text-blue-800 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-200">
+                  <i class="fas fa-school text-blue-600"></i> Conta Escolar Verificada
+                </span>
+              </div>
+            </div>
+
+            <!-- Selos e Conquistas de Estudo -->
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+              <h5 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <i class="fas fa-award text-amber-500"></i> Selos de Estudo Matchat
+              </h5>
+              <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
+                <div class="p-2 bg-amber-50 rounded-xl border border-amber-200">
+                  <span class="text-lg">🧮</span>
+                  <p class="font-bold text-amber-900 mt-0.5">Fera da Math</p>
+                </div>
+                <div class="p-2 bg-purple-50 rounded-xl border border-purple-200">
+                  <span class="text-lg">📚</span>
+                  <p class="font-bold text-purple-900 mt-0.5">Leitor Nota 10</p>
+                </div>
+                <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-200">
+                  <span class="text-lg">🤝</span>
+                  <p class="font-bold text-emerald-900 mt-0.5">Colega Nota 10</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel de Segurança dos Pais / Escola -->
+            <div class="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 text-xs shadow-sm">
+              <div class="p-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-slate-700">
+                  <i class="fas fa-graduation-cap text-brand-500"></i>
+                  <span>Série / Turma</span>
+                </div>
+                <span class="font-semibold text-slate-500" id="profile-grade">8º Ano Fundamental</span>
+              </div>
+
+              <div class="p-3.5 flex justify-between items-center" id="profile-parent-row">
+                <div class="flex items-center gap-2 text-slate-700">
+                  <i class="fas fa-user-shield text-brand-500"></i>
+                  <span id="profile-parent-title">E-mail do Responsável</span>
+                </div>
+                <span class="font-semibold text-slate-500" id="profile-parent-val">Incluso via Escola</span>
+              </div>
+
+              <div class="p-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-slate-700">
+                  <i class="fas fa-face-smile text-brand-500"></i>
+                  <span>Login Face ID</span>
+                </div>
+                <span class="font-bold text-emerald-600"><i class="fas fa-check"></i> Ativo</span>
+              </div>
+
+              <div class="p-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-slate-700">
+                  <i class="fas fa-filter text-brand-500"></i>
+                  <span>Filtro Anti-Palavrões</span>
+                </div>
+                <span class="font-bold text-emerald-600">Sempre Ativo</span>
+              </div>
+            </div>
+
+            <button onclick="navigate('screen-splash')" class="w-full bg-red-50 text-red-600 font-bold py-3 rounded-xl border border-red-200 text-xs hover:bg-red-100 transition flex items-center justify-center gap-2">
+              <i class="fas fa-sign-out-alt"></i> Sair do Aplicativo
+            </button>
+          </div>
+
+        </div>
+
+        <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-2 z-30">
+          <button onclick="switchTab('subjects')" id="nav-subjects" class="flex flex-col items-center text-brand-500 font-bold text-[11px] py-1 px-3">
+            <i class="fas fa-book-open text-base mb-0.5"></i>
+            <span>Matérias</span>
+          </button>
+          <button onclick="switchTab('private')" id="nav-private" class="flex flex-col items-center text-slate-400 font-bold text-[11px] py-1 px-3 hover:text-brand-500">
+            <i class="fas fa-comments text-base mb-0.5"></i>
+            <span>Conversas</span>
+          </button>
+          <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-slate-400 font-bold text-[11px] py-1 px-3 hover:text-brand-500">
+            <i class="fas fa-user-shield text-base mb-0.5"></i>
+            <span>Perfil</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- 5. TELA DE CHAT (SALAS OU DM) -->
+      <div id="screen-chat" class="screen flex-col h-full bg-slate-100 relative z-20">
+        <!-- Header do Chat -->
+        <div class="bg-white border-b border-slate-200 px-3 py-2.5 flex items-center justify-between shadow-sm shrink-0">
+          <div class="flex items-center gap-2">
+            <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <div id="chat-header-icon" class="w-8 h-8 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold">
+              📐
+            </div>
+            <div>
+              <h4 id="chat-title" class="font-bold text-slate-800 text-xs">Matemática</h4>
+              <p id="chat-subtitle" class="text-[10px] text-slate-400">24 alunos online</p>
+            </div>
+          </div>
+
+          <!-- Botão de Denúncia Instantânea -->
+          <button onclick="openReportModal()" class="text-[11px] bg-red-50 text-red-600 border border-red-200 font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 hover:bg-red-100 transition">
+            <i class="fas fa-triangle-exclamation"></i> Denunciar
+          </button>
+        </div>
+
+        <!-- Mensagens do Chat -->
+        <div id="chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3 bg-slate-100 text-xs">
+          <!-- Mensagens Injetadas via JS -->
+        </div>
+
+        <!-- Campo de Input para Envio de Mensagem -->
+        <div class="p-2.5 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
+          <input type="text" id="chat-input-text" placeholder="Escreva com respeito..." onkeypress="handleKeyPress(event)" class="flex-1 p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <button onclick="sendMessage()" class="w-9 h-9 bg-brand-500 text-white rounded-xl flex items-center justify-center hover:bg-brand-600 transition shrink-0">
+            <i class="fas fa-paper-plane text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODAL DE SIMULAÇÃO DE FACE ID -->
+    <div id="modal-faceid" class="absolute inset-0 bg-slate-900/90 backdrop-blur-md flex justify-center items-center p-6 hidden z-50">
+      <div class="bg-white w-full max-w-[290px] rounded-3xl p-6 text-center space-y-4 shadow-2xl relative">
+        <div class="relative w-28 h-28 mx-auto flex items-center justify-center">
+          <div class="absolute inset-0 border-4 border-dashed border-brand-500 rounded-3xl animate-spin" style="animation-duration: 8s;"></div>
+          <div class="w-20 h-20 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-500 text-4xl relative overflow-hidden">
+            <i class="fas fa-face-smile"></i>
+            <div class="absolute w-full h-1 bg-brand-accent shadow-[0_0_8px_#00CEC9] scan-line"></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-extrabold text-slate-800 text-base">Escâner Biométrico</h3>
+          <p class="text-slate-500 text-[11px] mt-1">Reconhecendo dados do Matchat...</p>
+        </div>
+
+        <button onclick="confirmFaceIDSuccess()" class="w-full bg-brand-500 text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-brand-600 transition">
+          Simular Reconhecimento
+        </button>
+        <button onclick="closeFaceIDModal()" class="text-xs text-slate-400 underline block mx-auto">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- MODAL DE DENÚNCIA / MODERAÇÃO SUB-15 -->
+    <div id="modal-report" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex justify-center items-center p-6 hidden z-50">
+      <div class="bg-white w-full max-w-[310px] rounded-3xl p-5 space-y-3 shadow-2xl">
+        <div class="flex items-center gap-2 text-red-600">
+          <i class="fas fa-shield-cat text-xl"></i>
+          <h3 class="font-bold text-slate-800 text-sm">Denunciar à Moderação</h3>
+        </div>
+        <p class="text-slate-500 text-[11px] leading-relaxed">
+          Nossa equipe e os responsáveis receberão uma cópia do trecho para análise de segurança.
+        </p>
+
+        <div class="space-y-1.5 text-xs">
+          <label class="font-bold text-slate-700 text-[11px]">Motivo da Denúncia:</label>
+          <select id="report-reason" class="w-full p-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs">
+            <option>Linguagem Inadequada ou Ofensiva</option>
+            <option>Bullying / Provocação</option>
+            <option>Compartilhamento de Dados Pessoais</option>
+            <option>Comportamento Impróprio</option>
+          </select>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button onclick="closeReportModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-xs hover:bg-slate-200">
+            Cancelar
+          </button>
+          <button onclick="submitReport()" class="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl text-xs hover:bg-red-700 shadow-md">
+            Enviar Alerta
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT DO MATCHAT -->
+  <script>
+    // LISTA DE SALAS DE MATÉRIAS
+    const subjectsData = [
+      { id: 'math', name: 'Matemática', icon: '📐', bg: 'bg-blue-100', text: 'text-blue-600', online: 24 },
+      { id: 'port', name: 'Português', icon: '📖', bg: 'bg-red-100', text: 'text-red-600', online: 19 },
+      { id: 'hist', name: 'História', icon: '🏛️', bg: 'bg-amber-100', text: 'text-amber-600', online: 12 },
+      { id: 'scie', name: 'Ciências', icon: '🔬', bg: 'bg-emerald-100', text: 'text-emerald-600', online: 31 },
+      { id: 'geog', name: 'Geografia', icon: '🌍', bg: 'bg-teal-100', text: 'text-teal-600', online: 15 },
+      { id: 'engl', name: 'Inglês', icon: '🇬🇧', bg: 'bg-purple-100', text: 'text-purple-600', online: 22 },
+      { id: 'arts', name: 'Artes', icon: '🎨', bg: 'bg-pink-100', text: 'text-pink-600', online: 9 },
+      { id: 'pe', name: 'Ed. Física', icon: '⚽', bg: 'bg-orange-100', text: 'text-orange-600', online: 14 }
+    ];
+
+    // LISTA DE AMIGOS DMs
+    const friendsData = [
+      { id: 'f1', name: 'Lucas Gabriel', avatar: 'LG', color: 'bg-indigo-500', status: 'online', lastMsg: 'Conseguiu fazer o exercício de História?', time: '10:12' },
+      { id: 'f2', name: 'Mariana Costa', avatar: 'MC', color: 'bg-pink-500', status: 'offline', lastMsg: 'Obrigada pela dica de Inglês!', time: 'Ontem' },
+      { id: 'f3', name: 'Pedro Henrique', avatar: 'PH', color: 'bg-teal-500', status: 'online', lastMsg: 'Valeu pelas fórmulas de Ciências!', time: 'Segunda' }
+    ];
+
+    // MENSAGENS INICIAIS
+    const roomMessages = {
+      'math': [
+        { sender: 'Moderação Matchat', text: 'Bem-vindos à sala de Matemática! Respeite seus colegas de estudo.', isSystem: true },
+        { sender: 'Lucas G. (8º Ano)', text: 'Alguém pode me ajudar na questão 3 de equação de 1º grau?' },
+        { sender: 'Mariana C. (8º Ano)', text: 'É só isolar o X mudando o sinal do outro lado!' }
+      ],
+      'port': [
+        { sender: 'Moderação Matchat', text: 'Mantenha a boa linguagem na sala de Português!', isSystem: true },
+        { sender: 'Pedro (9º Ano)', text: 'Alguém lembra qual é a regra do "por que" separado com acento?' }
+      ],
+      'f1': [
+        { sender: 'Lucas Gabriel', text: 'Oi Ana! Você vai no grupo de estudos de tarde?' }
+      ]
+    };
+
+    // DICIONÁRIO DE FILTRO ANTI-PALAVRÕES SUB-15
+    const badWords = ['chato', 'feio', 'bobo', 'idiota', 'otario', 'droga', 'palavrao', 'ruim', 'inutil', 'burro'];
+
+    let currentRoomId = 'math';
+    let registerEmailType = 'escola';
+    let loginEmailType = 'escola';
+
+    let currentUser = {
+      name: 'Ana Beatriz Silva',
+      email: 'aluno@escola.pr.gov.br',
+      isEscola: true,
+      grade: '8º Ano Fundamental',
+      parentEmail: 'Autorizado via Escola'
+    };
+
+    // ALTERNAR ABA CADASTRO: @ESCOLA VS PESSOAL
+    function toggleRegisterEmailType(type) {
+      registerEmailType = type;
+      const btnEscola = document.getElementById('btn-reg-type-escola');
+      const btnPessoal = document.getElementById('btn-reg-type-pessoal');
+      const label = document.getElementById('reg-email-label');
+      const input = document.getElementById('reg-email');
+      const hint = document.getElementById('reg-email-hint');
+      const parentContainer = document.getElementById('reg-parent-container');
+
+      if (type === 'escola') {
+        btnEscola.className = "flex-1 py-2.5 rounded-xl bg-white text-brand-600 shadow-sm transition";
+        btnPessoal.className = "flex-1 py-2.5 rounded-xl text-slate-500 transition";
+        label.innerText = "E-mail Escolar (@escola, @edu.br)";
+        input.placeholder = "aluno@escola.pr.gov.br";
+        hint.innerText = "Conexão direta com a sua instituição escolar.";
+        parentContainer.classList.add('hidden');
+      } else {
+        btnPessoal.className = "flex-1 py-2.5 rounded-xl bg-white text-brand-600 shadow-sm transition";
+        btnEscola.className = "flex-1 py-2.5 rounded-xl text-slate-500 transition";
+        label.innerText = "E-mail Pessoal (Gmail, Outlook, etc.)";
+        input.placeholder = "aluno@gmail.com";
+        hint.innerText = "Sua conta exigirá confirmação do e-mail do seu responsável.";
+        parentContainer.classList.remove('hidden');
+      }
+    }
+
+    // ALTERNAR ABA LOGIN: @ESCOLA VS PESSOAL
+    function toggleLoginEmailType(type) {
+      loginEmailType = type;
+      const btnEscola = document.getElementById('btn-login-type-escola');
+      const btnPessoal = document.getElementById('btn-login-type-pessoal');
+      const label = document.getElementById('login-email-label');
+      const input = document.getElementById('login-email');
+
+      if (type === 'escola') {
+        btnEscola.className = "flex-1 py-2 rounded-xl bg-white text-brand-600 shadow-sm transition";
+        btnPessoal.className = "flex-1 py-2 rounded-xl text-slate-500 transition";
+        label.innerText = "E-mail Escolar";
+        input.value = "aluno@escola.pr.gov.br";
+      } else {
+        btnPessoal.className = "flex-1 py-2 rounded-xl bg-white text-brand-600 shadow-sm transition";
+        btnEscola.className = "flex-1 py-2 rounded-xl text-slate-500 transition";
+        label.innerText = "E-mail Pessoal";
+        input.value = "aluno@gmail.com";
+      }
+    }
+
+    // RENDERIZAR QUADRO DE MATÉRIAS
+    function renderSubjects() {
+      const grid = document.getElementById('subjects-grid');
+      grid.innerHTML = subjectsData.map(s => `
+        <button onclick="openChat('${s.id}', '${s.name}', '${s.icon}', '${s.online} alunos online')" class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition text-left flex flex-col justify-between h-28">
+          <div class="w-9 h-9 rounded-xl ${s.bg} ${s.text} flex items-center justify-center font-bold text-lg">
+            ${s.icon}
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-800 text-xs">${s.name}</h4>
+            <p class="text-[10px] text-slate-400 font-medium">${s.online} online</p>
+          </div>
+        </button>
+      `).join('');
+    }
+
+    // RENDERIZAR AMIGOS
+    function renderFriends() {
+      const list = document.getElementById('friends-list');
+      list.innerHTML = friendsData.map(f => `
+        <div onclick="openChat('${f.id}', '${f.name}', '👤', 'Chat Privado Direct')" class="bg-white p-3 rounded-2xl border border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full ${f.color} text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                ${f.avatar}
+              </div>
+              <span class="w-3 h-3 rounded-full ${f.status === 'online' ? 'bg-emerald-500' : 'bg-slate-300'} border-2 border-white absolute bottom-0 right-0"></span>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800 text-xs">${f.name}</h4>
+              <p class="text-[11px] text-slate-400 truncate w-36">${f.lastMsg}</p>
+            </div>
+          </div>
+          <span class="text-[10px] text-slate-400 font-medium">${f.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // NAVEGAÇÃO DE TELAS
+    function navigate(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+      }
+    }
+
+    // MUDAR ABA DA DASHBOARD
+    function switchTab(tab) {
+      document.getElementById('tab-subjects').classList.add('hidden');
+      document.getElementById('tab-private').classList.add('hidden');
+      document.getElementById('tab-profile').classList.add('hidden');
+
+      const title = document.getElementById('dashboard-header-title');
+
+      document.getElementById('nav-subjects').className = "flex flex-col items-center text-slate-400 font-bold text-[11px] py-1 px-3 hover:text-brand-500";
+      document.getElementById('nav-private').className = "flex flex-col items-center text-slate-400 font-bold text-[11px] py-1 px-3 hover:text-brand-500";
+      document.getElementById('nav-profile').className = "flex flex-col items-center text-slate-400 font-bold text-[11px] py-1 px-3 hover:text-brand-500";
+
+      if (tab === 'subjects') {
+        document.getElementById('tab-subjects').classList.remove('hidden');
+        document.getElementById('nav-subjects').className = "flex flex-col items-center text-brand-500 font-bold text-[11px] py-1 px-3";
+        title.innerText = "Salas de Estudo";
+      } else if (tab === 'private') {
+        document.getElementById('tab-private').classList.remove('hidden');
+        document.getElementById('nav-private').className = "flex flex-col items-center text-brand-500 font-bold text-[11px] py-1 px-3";
+        title.innerText = "Conversas Privadas";
+      } else if (tab === 'profile') {
+        document.getElementById('tab-profile').classList.remove('hidden');
+        document.getElementById('nav-profile').className = "flex flex-col items-center text-brand-500 font-bold text-[11px] py-1 px-3";
+        title.innerText = "Perfil & Responsáveis";
+      }
+    }
+
+    // ABRIR CHAT
+    function openChat(id, name, icon, subtitle) {
+      currentRoomId = id;
+      document.getElementById('chat-title').innerText = name;
+      document.getElementById('chat-subtitle').innerText = subtitle;
+      document.getElementById('chat-header-icon').innerText = icon;
+
+      renderMessages();
+      navigate('screen-chat');
+    }
+
+    function closeChat() {
+      navigate('screen-dashboard');
+    }
+
+    // FILTRO ANTI-PALAVRÕES
+    function filterBadWords(text) {
+      let filtered = text;
+      badWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        filtered = filtered.replace(regex, '***');
+      });
+      return filtered;
+    }
+
+    // RENDERIZAR MENSAGENS
+    function renderMessages() {
+      const container = document.getElementById('chat-messages-container');
+      const msgs = roomMessages[currentRoomId] || [
+        { sender: 'Sistema', text: 'Canal seguro monitorado 24 horas.', isSystem: true }
+      ];
+
+      container.innerHTML = msgs.map(m => {
+        if (m.isSystem) {
+          return `<div class="text-center text-[10px] bg-slate-200/70 text-slate-600 py-1 px-3 rounded-full mx-auto w-max font-medium my-1">${m.text}</div>`;
+        }
+        const isMe = m.sender === 'Você' || m.sender === currentUser.name;
+        return `
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} my-1">
+            <span class="text-[9px] text-slate-400 px-1 mb-0.5">${m.sender}</span>
+            <div class="${isMe ? 'bg-brand-500 text-white rounded-2xl rounded-tr-none' : 'bg-white text-slate-800 border border-slate-200 rounded-2xl rounded-tl-none'} p-2.5 max-w-[82%] shadow-sm">
+              <p class="leading-relaxed">${m.text}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // ENVIAR MENSAGEM
+    function sendMessage() {
+      const input = document.getElementById('chat-input-text');
+      const rawText = input.value.trim();
+      if (!rawText) return;
+
+      const cleanText = filterBadWords(rawText);
+
+      if (rawText !== cleanText) {
+        showToast("Filtro Ativado 🛡️", "Linguagem alterada pelo filtro de segurança.");
+      }
+
+      if (!roomMessages[currentRoomId]) {
+        roomMessages[currentRoomId] = [];
+      }
+
+      roomMessages[currentRoomId].push({
+        sender: 'Você',
+        text: cleanText
+      });
+
+      input.value = '';
+      renderMessages();
+
+      // Resposta Automática
+      setTimeout(() => {
+        if (currentRoomId === 'math' || currentRoomId === 'f1') {
+          roomMessages[currentRoomId].push({
+            sender: currentRoomId === 'math' ? 'Mariana (8º Ano)' : 'Lucas Gabriel',
+            text: 'Muito bom! Vamos continuar estudando juntos!'
+          });
+          renderMessages();
+        }
+      }, 1400);
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    // FACE ID SIMULATOR
+    function triggerFaceIDScan() {
+      document.getElementById('modal-faceid').classList.remove('hidden');
+    }
+
+    function closeFaceIDModal() {
+      document.getElementById('modal-faceid').classList.add('hidden');
+    }
+
+    function confirmFaceIDSuccess() {
+      closeFaceIDModal();
+      showToast("Biometria Reconhecida!", "Bem-vindo ao Matchat.");
+      navigate('screen-dashboard');
+    }
+
+    // MODAL DE DENÚNCIA
+    function openReportModal() {
+      document.getElementById('modal-report').classList.remove('hidden');
+    }
+
+    function closeReportModal() {
+      document.getElementById('modal-report').classList.add('hidden');
+    }
+
+    function submitReport() {
+      closeReportModal();
+      showToast("Alerta Enviado 🛡️", "A moderação revisará a mensagem com urgência.");
+    }
+
+    // LOGIN & CADASTRO LOGIC
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      
+      currentUser.email = email;
+      currentUser.isEscola = loginEmailType === 'escola';
+      currentUser.name = loginEmailType === 'escola' ? "Ana Beatriz Silva" : "Gabriel Souza";
+      
+      updateProfileUI();
+      showToast("Acesso Efetuado", "Conectado ao ambiente seguro.");
+      navigate('screen-dashboard');
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+      const grade = document.getElementById('reg-grade').value;
+
+      currentUser.name = name;
+      currentUser.email = email;
+      currentUser.grade = grade;
+      currentUser.isEscola = registerEmailType === 'escola';
+      currentUser.parentEmail = registerEmailType === 'escola' ? 'Incluso via Escola' : document.getElementById('reg-parent-email').value;
+
+      updateProfileUI();
+
+      if (registerEmailType === 'escola') {
+        showToast("Conta Criada!", "Identidade escolar validada.");
+      } else {
+        showToast("Solicitação Enviada!", "Enviamos o e-mail de confirmação ao seu responsável.");
+      }
+
+      navigate('screen-dashboard');
+    }
+
+    function updateProfileUI() {
+      document.getElementById('profile-name').innerText = currentUser.name;
+      document.getElementById('profile-email').innerText = currentUser.email;
+      document.getElementById('profile-grade').innerText = currentUser.grade;
+      document.getElementById('profile-parent-val').innerText = currentUser.parentEmail;
+
+      const badge = document.getElementById('profile-status-badge');
+      const headerBadge = document.getElementById('dashboard-user-badge');
+
+      if (currentUser.isEscola) {
+        badge.innerHTML = `
+          <span class="inline-block bg-blue-100 text-blue-800 text-[10px] font-bold px-3 py-1 rounded-full border border-blue-200">
+            <i class="fas fa-school text-blue-600"></i> Conta Escolar Verificada
+          </span>
+        `;
+        headerBadge.innerText = "Conta Escolar Verificada";
+      } else {
+        badge.innerHTML = `
+          <span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-3 py-1 rounded-full border border-amber-200">
+            <i class="fas fa-user-check text-amber-600"></i> Conta Pessoal (Autorizada pelo Pai/Mãe)
+          </span>
+        `;
+        headerBadge.innerText = "Conta Pessoal Autorizada";
+      }
+
+      document.getElementById('profile-avatar').innerText = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    }
+
+    // TOAST SYSTEM
+    function showToast(title, body) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-title').innerText = title;
+      document.getElementById('toast-body').innerText = body;
+
+      toast.classList.remove('-translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-24', 'opacity-0');
+      }, 3500);
+    }
+
+    // RELÓGIO
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clock').innerText = `${hours}:${minutes}`;
+    }
+
+    // INICIALIZAÇÃO
+    window.onload = function() {
+      renderSubjects();
+      renderFriends();
+      updateClock();
+      setInterval(updateClock, 10000);
+    };
+  </script>
+</body>
+</html>
